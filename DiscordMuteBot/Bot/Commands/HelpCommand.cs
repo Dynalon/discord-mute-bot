@@ -65,6 +65,29 @@ namespace Bot.Commands
                         stringBuilder.AppendLine(commandParameters);
                     }
                     
+                    if (command.Preconditions.Count > 0)
+                    {
+                        stringBuilder.AppendLine("- Preconditions:");
+
+                        IEnumerable<string> preconditionInformation = command
+                            .Preconditions
+                            .Select(precondition =>
+                            {
+                                string preconditionText = $"* ";
+                                
+                                if (precondition is RequireContextAttribute requireContextAttribute)
+                                {
+                                    preconditionText += $"Required context: {requireContextAttribute.Contexts}";
+                                }
+                                
+                                return preconditionText;
+                            });
+                        
+                        string commandPreconditions = string.Join(Environment.NewLine, preconditionInformation);
+                        
+                        stringBuilder.AppendLine(commandPreconditions);
+                    }
+                    
                     return stringBuilder.ToString();
                 });
             
