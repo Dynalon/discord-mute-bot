@@ -8,5 +8,6 @@ namespace Bot
 
         public static bool IsObserved(ulong voiceChannelId) => _observedVoiceChannels.ContainsKey(voiceChannelId);
         public static void Observe(ulong voiceChannelId) => _observedVoiceChannels.Add(voiceChannelId, false);
+        public static bool Release(ulong voiceChannelId) => _observedVoiceChannels.Remove(voiceChannelId);
     }
 }

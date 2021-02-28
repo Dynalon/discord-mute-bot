@@ -83,7 +83,8 @@ namespace Bot.Extensions
                 .AddTransient<LogEventHandler>()
                 .AddTransient<LoggedInEventHandler>()
                 .AddTransient<LoggedOutEventHandler>()
-                .AddTransient<MessageReceivedEventHandler>();
+                .AddTransient<MessageReceivedEventHandler>()
+                .AddTransient<ChannelDestroyedEventHandler>();
         
         private static IServiceCollection ConfigureHostedServices(this IServiceCollection serviceCollection) 
             => serviceCollection
@@ -93,6 +94,7 @@ namespace Bot.Extensions
                 .AddHostedService<OnLogHostedService>()
                 .AddHostedService<OnLoggedInHostedService>()
                 .AddHostedService<OnLoggedOutHostedService>()
-                .AddHostedService<OnMessageReceivedHostedService>();
+                .AddHostedService<OnMessageReceivedHostedService>()
+                .AddHostedService<OnChannelDestroyedHostedService>();
     }
 }
