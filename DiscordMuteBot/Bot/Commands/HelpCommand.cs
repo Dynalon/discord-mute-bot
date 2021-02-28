@@ -45,7 +45,7 @@ namespace Bot.Commands
                             .Parameters
                             .Select(parameterInfo =>
                             {
-                                string parameterText = $"* Name: {parameterInfo.Name} | Datatype: {parameterInfo.Type} | Optional: {parameterInfo.IsOptional}";
+                                string parameterText = $"\t* Name: {parameterInfo.Name} | Datatype: {parameterInfo.Type} | Optional: {parameterInfo.IsOptional}";
                                 
                                 if (parameterInfo.IsOptional)
                                 {
@@ -73,7 +73,7 @@ namespace Bot.Commands
                             .Preconditions
                             .Select(precondition =>
                             {
-                                string preconditionText = $"* ";
+                                string preconditionText = $"\t* ";
                                 
                                 if (precondition is RequireContextAttribute requireContextAttribute)
                                 {
