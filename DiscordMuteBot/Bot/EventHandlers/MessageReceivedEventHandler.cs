@@ -23,6 +23,7 @@ namespace Bot.EventHandlers
             CommandService commandService,
             IServiceProvider serviceProvider)
         {
+            _logger = logger;
             _discordSocketClient = discordSocketClient;
             _botCommandOptionsMonitor = botCommandOptionsMonitor;
             _commandService = commandService;
