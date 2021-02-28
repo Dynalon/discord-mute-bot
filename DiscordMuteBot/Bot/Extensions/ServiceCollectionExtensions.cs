@@ -76,7 +76,8 @@ namespace Bot.Extensions
                 .AddSingleton<ConnectedEventHandler>()
                 .AddSingleton<DisconnectedEventHandler>()
                 .AddSingleton<LogEventHandler>()
-                .AddSingleton<LoggedInEventHandler>();
+                .AddSingleton<LoggedInEventHandler>()
+                .AddSingleton<LoggedOutEventHandler>();
         
         private static IServiceCollection ConfigureHostedServices(this IServiceCollection serviceCollection) 
             => serviceCollection
@@ -84,6 +85,7 @@ namespace Bot.Extensions
                 .AddHostedService<OnConnectedHostedService>()
                 .AddHostedService<OnDisconnectedHostedService>()
                 .AddHostedService<OnLogHostedService>()
-                .AddHostedService<OnLoggedInHostedService>();
+                .AddHostedService<OnLoggedInHostedService>()
+                .AddHostedService<OnLoggedOutHostedService>();
     }
 }
