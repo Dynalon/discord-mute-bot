@@ -73,11 +73,13 @@ namespace Bot.Extensions
         private static IServiceCollection ConfigureBotEventHandlers(this IServiceCollection serviceCollection) 
             => serviceCollection
                 .AddSingleton<ReadyEventHandler>()
-                .AddSingleton<ConnectedEventHandler>();
+                .AddSingleton<ConnectedEventHandler>()
+                .AddSingleton<DisconnectedEventHandler>();
         
         private static IServiceCollection ConfigureHostedServices(this IServiceCollection serviceCollection) 
             => serviceCollection
                 .AddHostedService<OnReadyHostedService>()
-                .AddHostedService<OnConnectedHostedService>();
+                .AddHostedService<OnConnectedHostedService>()
+                .AddHostedService<OnDisconnectedHostedService>();
     }
 }
