@@ -19,12 +19,14 @@ namespace Bot.Extensions
                 .ConfigureOptionValidators()
                 .ConfigureOptions()
                 .ConfigureDiscordSocketClient()
-                .ConfigureBotCommands()
                 .ConfigureBotEventHandlers()
+                .ConfigureBotCommands()
                 .ConfigureHostedServices();
         
         private static IServiceCollection ConfigureOptionValidators(this IServiceCollection serviceCollection)
-            => serviceCollection.AddSingleton<IValidateOptions<BotOptions>, BotOptionsValidator>();
+            => serviceCollection
+                .AddSingleton<IValidateOptions<BotOptions>, BotOptionsValidator>()
+                .AddSingleton<IValidateOptions<ObservedVoiceChannelOptions>, ObservedVoiceChannelOptionsValidator>();
 
         private static IServiceCollection ConfigureOptions(this IServiceCollection serviceCollection)
         {
@@ -36,6 +38,9 @@ namespace Bot.Extensions
             
             IConfigurationSection botCommandsConfigurationSection = configuration.GetSection("BotCommands");
             serviceCollection.Configure<BotCommandOptions>(botCommandsConfigurationSection);
+            
+            IConfigurationSection observedVoiceChannelOptionsSection = configuration.GetSection("ObservedVoiceChannel");
+            serviceCollection.Configure<ObservedVoiceChannelOptions>(observedVoiceChannelOptionsSection);
             
             return serviceCollection;
         }
@@ -72,13 +77,13 @@ namespace Bot.Extensions
         
         private static IServiceCollection ConfigureBotEventHandlers(this IServiceCollection serviceCollection) 
             => serviceCollection
-                .AddSingleton<ReadyEventHandler>()
-                .AddSingleton<ConnectedEventHandler>()
-                .AddSingleton<DisconnectedEventHandler>()
-                .AddSingleton<LogEventHandler>()
-                .AddSingleton<LoggedInEventHandler>()
-                .AddSingleton<LoggedOutEventHandler>()
-                .AddSingleton<MessageReceivedEventHandler>();
+                .AddTransient<ReadyEventHandler>()
+                .AddTransient<ConnectedEventHandler>()
+                .AddTransient<DisconnectedEventHandler>()
+                .AddTransient<LogEventHandler>()
+                .AddTransient<LoggedInEventHandler>()
+                .AddTransient<LoggedOutEventHandler>()
+                .AddTransient<MessageReceivedEventHandler>();
         
         private static IServiceCollection ConfigureHostedServices(this IServiceCollection serviceCollection) 
             => serviceCollection
