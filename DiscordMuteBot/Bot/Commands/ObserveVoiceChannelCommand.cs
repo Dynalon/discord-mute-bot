@@ -11,10 +11,14 @@ namespace Bot.Commands
     public sealed class ObserveVoiceChannelCommand : ModuleBase
     {
         private readonly IOptionsMonitor<ObservedVoiceChannelOptions> _observedVoiceChannelOptionsMonitor;
+        private readonly ObservedVoiceChannelsCache _observedVoiceChannelsCache;
         
-        public ObserveVoiceChannelCommand(IOptionsMonitor<ObservedVoiceChannelOptions> observedVoiceChannelOptionsMonitor)
+        public ObserveVoiceChannelCommand(
+            IOptionsMonitor<ObservedVoiceChannelOptions> observedVoiceChannelOptionsMonitor,
+            ObservedVoiceChannelsCache observedVoiceChannelsCache)
         {
             _observedVoiceChannelOptionsMonitor = observedVoiceChannelOptionsMonitor;
+            _observedVoiceChannelsCache = observedVoiceChannelsCache;
         }
         
         [Command("observe")]
@@ -30,18 +34,23 @@ namespace Bot.Commands
             {
                 await Context.Channel.SendMessageAsync($"Voice channel with id {voiceChannelId} not found on this guild.");
             }
-            else if (ObservedVoiceChannelsCache.IsObserved(voiceChannelId))
+            else if (_observedVoiceChannelsCache.ContainsKey(voiceChannelId))
             {
                 await Context.Channel.SendMessageAsync($"Voice channel {voiceChannel.Name} is already under observation.");
             }
             else
             {
-                ObservedVoiceChannelsCache.Observe(voiceChannelId);
-                
                 IUserMessage message = await Context.Channel.SendMessageAsync($"Observing voice channel {voiceChannel.Name}.");
                     
                 IEmote emote = new Emoji(_observedVoiceChannelOptionsMonitor.CurrentValue.MutedEmoji);
                 await message.AddReactionAsync(emote);
+                
+                _observedVoiceChannelsCache.Add(voiceChannelId, new ObservedVoiceChannel()
+                {
+                    VoiceChannelId = voiceChannelId,
+                    IsMuted = false,
+                    MessageId = message.Id
+                });
             }
         }
     }

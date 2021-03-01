@@ -16,6 +16,7 @@ namespace Bot.Extensions
         public static IServiceCollection ConfigureServices(this IServiceCollection serviceCollection)
             => serviceCollection
                 .AddSingleton<IServiceProvider>(serviceProvider => serviceProvider)
+                .AddSingleton<ObservedVoiceChannelsCache>()
                 .ConfigureOptionValidators()
                 .ConfigureOptions()
                 .ConfigureDiscordSocketClient()
@@ -84,7 +85,8 @@ namespace Bot.Extensions
                 .AddTransient<LoggedInEventHandler>()
                 .AddTransient<LoggedOutEventHandler>()
                 .AddTransient<MessageReceivedEventHandler>()
-                .AddTransient<ChannelDestroyedEventHandler>();
+                .AddTransient<ChannelDestroyedEventHandler>()
+                .AddTransient<ReactionAddedEventHandler>();
         
         private static IServiceCollection ConfigureHostedServices(this IServiceCollection serviceCollection) 
             => serviceCollection
@@ -95,6 +97,7 @@ namespace Bot.Extensions
                 .AddHostedService<OnLoggedInHostedService>()
                 .AddHostedService<OnLoggedOutHostedService>()
                 .AddHostedService<OnMessageReceivedHostedService>()
-                .AddHostedService<OnChannelDestroyedHostedService>();
+                .AddHostedService<OnChannelDestroyedHostedService>()
+                .AddHostedService<OnReactionAddedHostedService>();
     }
 }

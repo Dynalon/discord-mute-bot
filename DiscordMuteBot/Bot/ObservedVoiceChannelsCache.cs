@@ -2,13 +2,7 @@ using System.Collections.Generic;
 
 namespace Bot
 {
-    public static class ObservedVoiceChannelsCache
+    public sealed class ObservedVoiceChannelsCache : Dictionary<ulong, ObservedVoiceChannel>
     {
-        private static readonly Dictionary<ulong, bool> _observedVoiceChannels = new Dictionary<ulong, bool>();
-
-        public static bool TryGetVoiceChannelMuteState(ulong voiceChannelId, out bool voiceChannelIsMuted) => _observedVoiceChannels.TryGetValue(voiceChannelId, out voiceChannelIsMuted);
-        public static bool IsObserved(ulong voiceChannelId) => _observedVoiceChannels.ContainsKey(voiceChannelId);
-        public static void Observe(ulong voiceChannelId) => _observedVoiceChannels.Add(voiceChannelId, false);
-        public static bool Release(ulong voiceChannelId) => _observedVoiceChannels.Remove(voiceChannelId);
     }
 }

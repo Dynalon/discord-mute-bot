@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +8,13 @@ namespace Bot.Commands
 {
     public sealed class ReleaseVoiceChannelCommand : ModuleBase
     {
+        private readonly ObservedVoiceChannelsCache _observedVoiceChannelsCache;
+        
+        public ReleaseVoiceChannelCommand(ObservedVoiceChannelsCache observedVoiceChannelsCache)
+        {
+            _observedVoiceChannelsCache = observedVoiceChannelsCache;
+        }
+        
         [Command("release")]
         [Alias("r")]
         [RequireContext(ContextType.Guild)]
@@ -17,18 +23,18 @@ namespace Bot.Commands
         {
             IReadOnlyCollection<IVoiceChannel> guildVoiceChannels = await Context.Guild.GetVoiceChannelsAsync();
             IVoiceChannel voiceChannel = guildVoiceChannels.FirstOrDefault(currentVoiceChannel => currentVoiceChannel.Id == voiceChannelId);
-            
+
             if (voiceChannel == null)
             {
                 await Context.Channel.SendMessageAsync($"Voice channel with id {voiceChannelId} not found on this guild.");
             }
-            else if (!ObservedVoiceChannelsCache.TryGetVoiceChannelMuteState(voiceChannelId, out bool voiceChannelIsMuted))
+            else if (!_observedVoiceChannelsCache.TryGetValue(voiceChannelId, out ObservedVoiceChannel observedVoiceChannel))
             {
                 await Context.Channel.SendMessageAsync($"Voice channel {voiceChannel.Name} hasn't been observed.");
             }
             else
             {
-                if (voiceChannelIsMuted)
+                if (observedVoiceChannel.IsMuted)
                 {
                     IEnumerable<IGuildUser> voiceChannelUsers = await voiceChannel
                         .GetUsersAsync()
@@ -40,7 +46,7 @@ namespace Bot.Commands
                     await Task.WhenAll(unmuteTasks);
                 }
 
-                ObservedVoiceChannelsCache.Release(voiceChannelId);
+                _observedVoiceChannelsCache.Remove(voiceChannelId);
                 
                 await Context.Channel.SendMessageAsync($"Voice channel {voiceChannel.Name} has been released from observation.");
             }
