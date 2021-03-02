@@ -86,7 +86,8 @@ namespace Bot.Extensions
                 .AddTransient<LoggedOutEventHandler>()
                 .AddTransient<MessageReceivedEventHandler>()
                 .AddTransient<ChannelDestroyedEventHandler>()
-                .AddTransient<ReactionAddedEventHandler>();
+                .AddTransient<ReactionAddedEventHandler>()
+                .AddTransient<UserVoiceStateUpdatedEventHandler>();
         
         private static IServiceCollection ConfigureHostedServices(this IServiceCollection serviceCollection) 
             => serviceCollection
@@ -98,6 +99,7 @@ namespace Bot.Extensions
                 .AddHostedService<OnLoggedOutHostedService>()
                 .AddHostedService<OnMessageReceivedHostedService>()
                 .AddHostedService<OnChannelDestroyedHostedService>()
-                .AddHostedService<OnReactionAddedHostedService>();
+                .AddHostedService<OnReactionAddedHostedService>()
+                .AddHostedService<OnUserVoiceStateUpdatedHostedService>();
     }
 }
