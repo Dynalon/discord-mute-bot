@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 
 namespace Bot.Commands
 {
@@ -39,9 +40,17 @@ namespace Bot.Commands
                     IEnumerable<IGuildUser> voiceChannelUsers = await voiceChannel
                         .GetUsersAsync()
                         .FlattenAsync();
-                    
-                    IEnumerable<Task> unmuteTasks = voiceChannelUsers.Select(voiceChannelUser =>
-                        voiceChannelUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = false));
+
+                    IEnumerable<Task> unmuteTasks = voiceChannelUsers
+                        .Where(voiceChannelUser =>
+                        {
+                            SocketGuildUser socketGuildUser = voiceChannelUser as SocketGuildUser;
+                            bool userIsMuted = socketGuildUser.VoiceState?.IsMuted == true;
+                            bool userNotOffline = socketGuildUser.Status != UserStatus.Offline;
+                            
+                            return userIsMuted && userNotOffline;
+                        })
+                        .Select(voiceChannelUser => voiceChannelUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = false));
                     
                     await Task.WhenAll(unmuteTasks);
                 }
