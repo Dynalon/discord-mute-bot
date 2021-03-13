@@ -32,7 +32,7 @@ namespace Bot.EventHandlers
                     userIsNotOffline
                     )
                 {
-                    await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = false);
+                    await SetUserMuteState(socketGuildUser, false);
                 }
                 // user joined observed muted voice channel
                 else if (oldSocketVoiceState.VoiceChannel == null && 
@@ -42,7 +42,7 @@ namespace Bot.EventHandlers
                          !userIsMuted &&
                          userIsNotOffline)
                 {
-                    await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = true);
+                    await SetUserMuteState(socketGuildUser, true);
                 }
                 // user changed voice channels
                 else if (oldSocketVoiceState.VoiceChannel != null && 
@@ -61,7 +61,7 @@ namespace Bot.EventHandlers
                         oldObservedVoiceChannel.IsMuted &&
                         userIsMuted)
                     {
-                        await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = false);
+                        await SetUserMuteState(socketGuildUser, false);
                     }
                     // user moved from unobserved voice channel to observed muted voice channel
                     else if (!oldVoiceChannelObserved && 
@@ -69,7 +69,7 @@ namespace Bot.EventHandlers
                              newObservedVoiceChannel.IsMuted &&
                              !userIsMuted)
                     {
-                        await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = true);
+                        await SetUserMuteState(socketGuildUser, true);
                     }
                     // both voice channels are observed
                     else if (oldVoiceChannelObserved && newVoiceChannelObserved)
@@ -79,25 +79,28 @@ namespace Bot.EventHandlers
                             !newObservedVoiceChannel.IsMuted &&
                             userIsMuted)
                         {
-                            await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = false);
+                            await SetUserMuteState(socketGuildUser, false);
                         }
                         // user moved from unmuted to muted voice channel
                         else if (!oldObservedVoiceChannel.IsMuted && 
                                  newObservedVoiceChannel.IsMuted && 
                                  !userIsMuted)
                         {
-                            await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = true);
+                            await SetUserMuteState(socketGuildUser, true);
                         }
                         // user moved from muted to muted voice channel
                         else if (oldObservedVoiceChannel.IsMuted && 
                                  newObservedVoiceChannel.IsMuted && 
                                  !userIsMuted)
                         {
-                            await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = true);
+                            await SetUserMuteState(socketGuildUser, true);
                         }
                     }
                 }
             }
         }
+
+        private Task SetUserMuteState(SocketGuildUser socketGuildUser, bool muteUser)
+            => socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = muteUser);
     }
 }
