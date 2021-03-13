@@ -88,6 +88,13 @@ namespace Bot.EventHandlers
                         {
                             await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = true);
                         }
+                        // user moved from muted to muted voice channel
+                        else if (oldObservedVoiceChannel.IsMuted && 
+                                 newObservedVoiceChannel.IsMuted && 
+                                 !userIsMuted)
+                        {
+                            await socketGuildUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = true);
+                        }
                     }
                 }
             }
