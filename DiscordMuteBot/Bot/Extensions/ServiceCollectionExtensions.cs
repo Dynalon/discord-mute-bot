@@ -7,6 +7,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Bot.Extensions
@@ -22,8 +23,9 @@ namespace Bot.Extensions
                 .ConfigureDiscordSocketClient()
                 .ConfigureBotEventHandlers()
                 .ConfigureBotCommands()
+                .ConfigureLogging()
                 .ConfigureHostedServices();
-        
+
         private static IServiceCollection ConfigureOptionValidators(this IServiceCollection serviceCollection)
             => serviceCollection
                 .AddSingleton<IValidateOptions<BotOptions>, BotOptionsValidator>()
@@ -33,50 +35,50 @@ namespace Bot.Extensions
         {
             ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
             IConfiguration configuration = serviceProvider.GetService<IConfiguration>();
-            
+
             IConfigurationSection botConfigurationSection = configuration.GetSection("Bot");
             serviceCollection.Configure<BotOptions>(botConfigurationSection);
-            
+
             IConfigurationSection botCommandsConfigurationSection = configuration.GetSection("BotCommands");
             serviceCollection.Configure<BotCommandOptions>(botCommandsConfigurationSection);
-            
+
             IConfigurationSection observedVoiceChannelOptionsSection = configuration.GetSection("ObservedVoiceChannel");
             serviceCollection.Configure<ObservedVoiceChannelOptions>(observedVoiceChannelOptionsSection);
-            
+
             return serviceCollection;
         }
 
-        private static IServiceCollection ConfigureDiscordSocketClient(this IServiceCollection serviceCollection) 
+        private static IServiceCollection ConfigureDiscordSocketClient(this IServiceCollection serviceCollection)
             => serviceCollection.AddSingleton<DiscordSocketClient>(serviceProvider =>
             {
                 IOptionsMonitor<BotOptions> botOptionsMonitor = serviceProvider.GetService<IOptionsMonitor<BotOptions>>();
                 BotOptions botOptions = botOptionsMonitor.CurrentValue;
-                
+
                 DiscordSocketConfig discordSocketConfig = new DiscordSocketConfig()
                 {
                     LogLevel = botOptions.LogSeverity
                 };
-                
+
                 return new DiscordSocketClient(discordSocketConfig);
             });
-        
-        private static IServiceCollection ConfigureBotCommands(this IServiceCollection serviceCollection) 
+
+        private static IServiceCollection ConfigureBotCommands(this IServiceCollection serviceCollection)
             => serviceCollection.AddSingleton<CommandService>(serviceProvider =>
             {
                 IOptionsMonitor<BotCommandOptions> botCommandOptionsMonitor = serviceProvider.GetService<IOptionsMonitor<BotCommandOptions>>();
                 BotCommandOptions botCommandOptions = botCommandOptionsMonitor.CurrentValue;
-                
+
                 CommandServiceConfig commandServiceConfig = new CommandServiceConfig()
                 {
                     LogLevel = botCommandOptions.LogSeverity,
                     DefaultRunMode = botCommandOptions.DefaultRunMode,
                     CaseSensitiveCommands = botCommandOptions.CaseSensitiveCommands
                 };
-                
+
                 return new CommandService(commandServiceConfig);
             });
-        
-        private static IServiceCollection ConfigureBotEventHandlers(this IServiceCollection serviceCollection) 
+
+        private static IServiceCollection ConfigureBotEventHandlers(this IServiceCollection serviceCollection)
             => serviceCollection
                 .AddTransient<ReadyEventHandler>()
                 .AddTransient<ConnectedEventHandler>()
@@ -88,8 +90,8 @@ namespace Bot.Extensions
                 .AddTransient<ChannelDestroyedEventHandler>()
                 .AddTransient<ReactionAddedEventHandler>()
                 .AddTransient<UserVoiceStateUpdatedEventHandler>();
-        
-        private static IServiceCollection ConfigureHostedServices(this IServiceCollection serviceCollection) 
+
+        private static IServiceCollection ConfigureHostedServices(this IServiceCollection serviceCollection)
             => serviceCollection
                 .AddHostedService<OnReadyHostedService>()
                 .AddHostedService<OnConnectedHostedService>()
@@ -101,5 +103,15 @@ namespace Bot.Extensions
                 .AddHostedService<OnChannelDestroyedHostedService>()
                 .AddHostedService<OnReactionAddedHostedService>()
                 .AddHostedService<OnUserVoiceStateUpdatedHostedService>();
+
+        private static IServiceCollection ConfigureLogging(this IServiceCollection serviceCollection)
+            => serviceCollection.AddLogging(options =>
+                {
+                    options.AddSimpleConsole(c =>
+                    {
+                        c.TimestampFormat = "[yyyyddMM HH:mm:ss.fff] ";
+                    });
+                });
+
     }
 }
