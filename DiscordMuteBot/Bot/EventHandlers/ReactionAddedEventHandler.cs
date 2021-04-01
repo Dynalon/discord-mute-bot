@@ -56,14 +56,6 @@ namespace Bot.EventHandlers
                         if (observedVoiceChannel.IsMuted && emoteIsUnMutedEmoji)
                         {
                             List<Task> tasks = voiceChannelUsers
-                                .Where(voiceChannelUser =>
-                                {
-                                    SocketGuildUser socketGuildUser = voiceChannelUser as SocketGuildUser;
-                                    bool userIsMuted = socketGuildUser.VoiceState?.IsMuted == true;
-                                    bool userNotOffline = socketGuildUser.Status != UserStatus.Offline;
-                            
-                                    return userIsMuted && userNotOffline;
-                                })
                                 .Select(voiceChannelUser => voiceChannelUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = false))
                                 .ToList();
                             
@@ -77,14 +69,6 @@ namespace Bot.EventHandlers
                         else if (!observedVoiceChannel.IsMuted && emoteIsMutedEmoji)
                         {
                             List<Task> tasks = voiceChannelUsers
-                                .Where(voiceChannelUser =>
-                                {
-                                    SocketGuildUser socketGuildUser = voiceChannelUser as SocketGuildUser;
-                                    bool userNotMuted = socketGuildUser.VoiceState?.IsMuted == false;
-                                    bool userNotOffline = socketGuildUser.Status != UserStatus.Offline;
-                            
-                                    return userNotMuted && userNotOffline;
-                                })
                                 .Select(voiceChannelUser => voiceChannelUser.ModifyAsync(guildUserProperties => guildUserProperties.Mute = true))
                                 .ToList();
                             

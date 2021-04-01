@@ -6,7 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Discord.Net" Version="2.3.0" />
+        <!-- <PackageReference Include="Discord.Net" Version="2.3.0" /> -->
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+        <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj" />
+        <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj" />
+        <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Commands\Discord.Net.Commands.csproj" />
+        <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
     </ItemGroup>
 </Project>
